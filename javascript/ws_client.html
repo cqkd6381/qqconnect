@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>WebSocket Echo Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
+    <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style type="text/css">
+        .show-grid {
+            margin-bottom: 15px;
+        }
+        .show-grid [class^="col-"] {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            background-color: #eee;
+            background-color: rgba(86,61,124,.15);
+            border: 1px solid #ddd;
+            border: 1px solid rgba(86,61,124,.2);
+        }
+    </style>
+    <script>
+    var ws = new WebSocket("ws://localhost:8181");
+    ws.onopen = function (e) {
+        console.log('Connection to server opened');
+    }
+    function sendMessage() {
+        ws.send($('#message').val());
+        // $('#message').val('');
+    }
+    ws.onmessage = function(msg){
+        console.log(msg.data);
+        var row = '<div class="col-md-6 col-md-offset-3">' + msg.data + '</div>';
+        $(".msg").append(row);
+    }
+    </script>
+</head>
+
+<body >
+    <div class="vertical-center">
+        <div class="container">
+            <p>&nbsp;</p>
+            <div class="row show-grid msg">
+                <div class="col-md-6 col-md-offset-3">信息</div>
+            </div>
+            <div class="row">
+                <div class="col-md-6 col-md-offset-3">
+                    <form class="form-inline" onsubmit="sendMessage();return false;">
+                        <div class="form-group">
+                            <input type="text" class="form-control" name="message" id="message" value="" />
+                        </div>
+                        <button type="button" id="send" class="btn btn-primary pull-right" onclick="sendMessage();">发送</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

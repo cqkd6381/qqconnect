@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>QQ JS登录</title>
+	<meta charset="utf-8">
+</head>
+<body>
+	<span id="qqLoginBtn"></span>
+	<script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="XXXXXXXXXXX" data-redirecturi="http://localhost/demos/qqconnect/javascript/callback.html" charset="utf-8"></script>
+	<script type="text/javascript">
+	    QC.Login({
+	       btnId:"qqLoginBtn"    //插入按钮的节点id
+		},function(reqData,opts){
+			var dom = document.getElementById(opts['btnId']),_logoutTemplate=[
+	            //头像
+	            '<span><img src="{figureurl}" class="{size_key}"/></span>',
+	            //昵称
+	            '<span>{nickname}</span>',
+	            //退出
+	            '<span><a href="javascript:QC.Login.signOut();">退出</a></span>', 
+	            //OpenID
+	            '<br /><span>OpenID : {openid}</span>'
+	       	].join("");
+	       	dom && (dom.innerHTML = QC.String.format(_logoutTemplate, {
+	           	nickname : QC.String.escHTML(reqData.nickname), //做xss过滤
+	           	figureurl : reqData.figureurl,
+	           	openid : reqData.figureurl.split("/")[5]
+	       	}));
+	       	if(checkCookie('qq_openid')){
+	       		// window.location.href="nodejs/ws_client.html";
+	       	}else{
+	       		setCookie('qq_openid',reqData.figureurl.split("/")[5],365);
+	       		// window.location.href="ws_client.html";
+	       	}
+		},function(opts){
+			window.location.reload();
+			delCookie('qq_openid');
+		});
+
+		function setCookie(c_name,value,expiredays)
+		{
+			var exdate = new Date();
+			exdate.setDate(exdate.getDate() + expiredays);
+			document.cookie = c_name + "=" + escape(value) + ((expiredays==null) ? "" : ";expires=" + exdate.toGMTString())
+		}
+
+		function getCookie(c_name)
+		{
+			if (document.cookie.length > 0){
+		  		c_start = document.cookie.indexOf(c_name + "=")
+		  		if (c_start != -1){ 
+		    		c_start = c_start + c_name.length + 1 
+		    		c_end = document.cookie.indexOf(";",c_start)
+		    		if (c_end == -1) c_end = document.cookie.length
+	    			return unescape(document.cookie.substring(c_start,c_end))
+		    	} 
+		  	}
+			return ""
+		}
+
+		function checkCookie(cookiename)
+		{
+			var username = getCookie(cookiename);
+			if (username != null && username != ""){
+				console.log('Welcome again ' + username + '!');
+				return true;
+			}else{
+		  		return false;
+		  	}
+		}
+
+		function delCookie(name)
+		{
+			var exp = new Date();
+			exp.setTime(exp.getTime() - 1);
+			var cval = getCookie(name);
+			if(cval != null)document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+		}
+	</script>
+</body>
+</html>
