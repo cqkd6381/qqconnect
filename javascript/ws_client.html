@@ -7,6 +7,7 @@
     <link href="https://cdn.bootcss.com/bootstrap/3.3.7/css/bootstrap.min.css" rel="stylesheet" />
     <script src="https://cdn.bootcss.com/jquery/1.12.4/jquery.min.js"></script>
     <script src="https://cdn.bootcss.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js"></script>
     <style type="text/css">
         .show-grid {
             margin-bottom: 15px;
@@ -21,19 +22,71 @@
         }
     </style>
     <script>
-    var ws = new WebSocket("ws://localhost:8181");
-    ws.onopen = function (e) {
-        console.log('Connection to server opened');
-    }
-    function sendMessage() {
-        ws.send($('#message').val());
-        // $('#message').val('');
-    }
-    ws.onmessage = function(msg){
-        console.log(msg.data);
-        var row = '<div class="col-md-6 col-md-offset-3">' + msg.data + '</div>';
-        $(".msg").append(row);
-    }
+        function setCookie(c_name,value,expiredays)
+        {
+            var exdate = new Date();
+            exdate.setDate(exdate.getDate() + expiredays);
+            document.cookie = c_name + "=" + escape(value) + ((expiredays==null) ? "" : ";expires=" + exdate.toGMTString() + ";path=/")
+        }
+        function checkCookie(cookiename){
+            var username = getCookie(cookiename);
+            if (username != null && username != ""){
+                console.log('Welcome again ' + username + '!');
+                return true;
+            }else{
+                return false;
+            }
+        }
+        function getCookie(c_name)
+        {
+            if (document.cookie.length > 0){
+                c_start = document.cookie.indexOf(c_name + "=")
+                if (c_start != -1){ 
+                    c_start = c_start + c_name.length + 1 
+                    c_end = document.cookie.indexOf(";",c_start)
+                    if (c_end == -1) c_end = document.cookie.length
+                    return unescape(document.cookie.substring(c_start,c_end))
+                } 
+            }
+            return ""
+        }
+        function delCookie(name)
+        {
+            var exp = new Date();
+            exp.setTime(exp.getTime() - 1);
+            var cval = getCookie(name);
+            if(cval != null)document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+        }
+        if(!checkCookie('__qc__k')){
+            window.location.href="index.html";
+        }
+        var ws = new WebSocket("ws://localhost:8181");
+        console.log(ws);
+        ws.onopen = function (e) {
+            console.log('Connection to server opened');
+        }
+        function sendMessage() {
+            ws.send($('#message').val());
+            // $('#message').val('');
+        }
+        ws.onmessage = function(msg){
+            console.log(msg.data);
+            var row = '<div class="col-md-6 col-md-offset-3">' + msg.data + '</div>';
+            $(".msg").append(row);
+        }
+        ws.onerror = function(e){
+            console.log("WebSocket Error: " , e);
+            //重连
+            ws = new WebSocket("ws://localhost:8181");
+        }
+        ws.onclose = function(e) {
+            console.log("Connection closed", e);
+        };
+        function logout(){
+            // alert('无法清除cookie');
+            setCookie('__qc__k','',-1);
+            window.location.href="ws_client.html";
+        }
     </script>
 </head>
 
@@ -42,7 +95,7 @@
         <div class="container">
             <p>&nbsp;</p>
             <div class="row show-grid msg">
-                <div class="col-md-6 col-md-offset-3">信息</div>
+                <div class="col-md-6 col-md-offset-3">信息<span class="pull-right" onclick="logout()">退出</span></div>
             </div>
             <div class="row">
                 <div class="col-md-6 col-md-offset-3">

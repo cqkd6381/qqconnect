@@ -6,7 +6,7 @@
 </head>
 <body>
 	<span id="qqLoginBtn"></span>
-	<script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="XXXXXXXXXXX" data-redirecturi="http://localhost/demos/qqconnect/javascript/callback.html" charset="utf-8"></script>
+	<script type="text/javascript" src="http://qzonestyle.gtimg.cn/qzone/openapi/qc_loader.js" data-appid="101388520" data-redirecturi="http://localhost/demos/qqconnect/javascript/callback.html" charset="utf-8"></script>
 	<script type="text/javascript">
 	    QC.Login({
 	       btnId:"qqLoginBtn"    //插入按钮的节点id
@@ -26,22 +26,23 @@
 	           	figureurl : reqData.figureurl,
 	           	openid : reqData.figureurl.split("/")[5]
 	       	}));
-	       	if(checkCookie('qq_openid')){
-	       		// window.location.href="nodejs/ws_client.html";
+	       	if(checkCookie('__qc__k')){
+	       		window.location.href="ws_client.html";//开放后，可以跳转到聊天室聊天界面
 	       	}else{
-	       		setCookie('qq_openid',reqData.figureurl.split("/")[5],365);
+	       		// setCookie('__qc__k',reqData.figureurl.split("/")[5],365);
 	       		// window.location.href="ws_client.html";
 	       	}
 		},function(opts){
 			window.location.reload();
-			delCookie('qq_openid');
+			// delCookie('__qc__k');
 		});
 
 		function setCookie(c_name,value,expiredays)
 		{
 			var exdate = new Date();
 			exdate.setDate(exdate.getDate() + expiredays);
-			document.cookie = c_name + "=" + escape(value) + ((expiredays==null) ? "" : ";expires=" + exdate.toGMTString())
+			document.cookie = c_name + "=" + escape(value) + ((expiredays==null) ? "" : ";expires=" + exdate.toGMTString() + ";path=/");
+
 		}
 
 		function getCookie(c_name)
@@ -76,6 +77,8 @@
 			var cval = getCookie(name);
 			if(cval != null)document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
 		}
+		// console.log(QC);
+		// console.log(QC.Login._getTokenKeys()['accessToken']);
 	</script>
 </body>
 </html>
